@@ -1,0 +1,9 @@
+[general]
+    location_id = "KIX"
+    location_pretty = "Osaka, Japan"
+    domain = "kix.example.com"
+
+[http]
+    destinations = [
+        "https://www.google.co.jp"
+    ]

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>{{.location_id}}</title>
+</head>
+
+<body>
+    <main style="max-width: 30em; margin-left: auto; margin-right: auto">
+    <div style="margin-bottom: 5px">
+        <span style="display: block; font-size: 2em">{{.domain}}</span>
+        <span>This server is running at {{.location_pretty}}.</span>
+    </div>
+    <div style="margin-bottom: 5px">
+        <span style="display: block; font-size: 1.3em">Server status</span>
+        <ul>
+            <li>Load average: {{.loadavg}}</li>
+            <li>Uptime: {{.uptime}}</li>
+            <li>Free RAM: {{.free_ram}}</li>
+        </ul>
+        <span style="display: block; font-size: 1.3em">Reachability from here</span>
+        <ul id="reach">
+            Loading...
+        </ul>
+    </div>
+    <div style="margin-bottom: 5px">
+        <span style="display: block; font-size: 1.3em">Your information</span>
+        <ul>
+            <li>You are connecting to us via {{.client_source}}.</li>
+        </ul>
+    </div>
+</main>
+
+<script async>
+    const url = '/reach'
+
+    fetch(url)
+        .then(function(res) {
+            return res.text();
+        })
+        .then(function(text) {
+            obj = JSON.parse(text);
+            let list_body = [];
+            for (let i = 0; i < obj.length; i++) {
+                if (obj[i].Reached) {
+                    reached = "✅"
+                } else {
+                    reached = "❌"
+                }
+
+                obj[i].Destination = obj[i].Destination.replace("https://", "")
+                obj[i].Destination = obj[i].Destination.replace("http://", "")
+
+                list_body.push('<li>' + obj[i].Destination + ": " + reached + '</li>')
+            }
+
+            let target = document.getElementById("reach");
+            target.innerHTML = list_body.join('');
+        })
+        
+</script>
+
+</body>
+
+</html>
