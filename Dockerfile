@@ -14,7 +14,6 @@ FROM golang:alpine3.17 AS runner
 WORKDIR /app
 
 COPY --from=builder /app/shokai ./
-COPY config.toml ./
 
 EXPOSE 3000
 
