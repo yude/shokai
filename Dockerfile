@@ -1,4 +1,4 @@
-FROM golang:1.20.3-bullseye AS builder
+FROM golang:alpine3.17 AS builder
 
 WORKDIR /app
 
@@ -7,9 +7,9 @@ COPY go.sum ./
 RUN go mod download
 
 COPY ./ ./
-RUN go build -o /shokai
+RUN go build -o shokai
 
-FROM debian:bullseye AS runner
+FROM golang:alpine3.17 AS runner
 
 WORKDIR /app
 
