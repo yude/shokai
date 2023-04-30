@@ -15,8 +15,9 @@
         <span style="display: block; font-size: 1.3em">Server status</span>
         <ul>
             <li>Load average: {{.loadavg}}</li>
-            <li>Uptime: {{.uptime}}</li>
-            <li>Free RAM: {{.free_ram}}</li>
+            <li>Up since {{.uptime}}</li>
+            <li>{{.ram_used}}% of RAM used</li>
+            <li>Temperature: {{.temperature}}</li>
         </ul>
         <span style="display: block; font-size: 1.3em">Reachability from here</span>
         <ul id="reach">

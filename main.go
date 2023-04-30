@@ -7,11 +7,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/BurntSushi/toml"
-	sigar "github.com/cloudfoundry/gosigar"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
+	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v3/load"
+	"github.com/shirou/gopsutil/v3/mem"
 )
 
 type (
@@ -86,12 +89,19 @@ func main() {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		// Retrieve server information
-		uptime := sigar.Uptime{}
-		uptime.Get()
-		loadavg := sigar.LoadAverage{}
-		loadavg.Get()
-		mem := sigar.Mem{}
-		mem.Get()
+		/// General informations
+		v_mem, _ := mem.VirtualMemory()
+		l, _ := load.Avg()
+		h, _ := host.BootTime()
+		btFromUnix := time.Unix(int64(h), 0)
+		/// Machine temperature
+		t, _ := host.SensorsTemperatures()
+		var temperature string
+		if len(t) > 0 {
+			temperature = fmt.Sprintf("%.2f ℃", t[0].Temperature)
+		} else {
+			temperature = "Not available."
+		}
 
 		var ip_version string
 		if isIpv6(c.IP()) {
@@ -104,10 +114,11 @@ func main() {
 			"location_id":     cfg.General.LocationId,
 			"location_pretty": cfg.General.LocationPretty,
 			"domain":          cfg.General.Domain,
-			"loadavg":         fmt.Sprintf("%.2f, %.2f, %.2f", loadavg.One, loadavg.Five, loadavg.Fifteen),
-			"uptime":          uptime.Format(),
-			"free_ram":        ByteCountDecimal(int64(mem.ActualFree)),
+			"loadavg":         fmt.Sprintf("%.2f, %.2f, %.2f", l.Load1, l.Load5, l.Load15),
+			"uptime":          btFromUnix,
+			"ram_used":        fmt.Sprintf("%.2f", v_mem.UsedPercent),
 			"client_source":   ip_version,
+			"temperature":     temperature,
 		})
 	})
 
