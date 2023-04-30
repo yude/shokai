@@ -134,7 +134,6 @@ func main() {
 
 	app.Get("/reach", func(c *fiber.Ctx) error {
 		if time.Now().Sub(last_reached) > 5*time.Minute {
-			fmt.Println("Pinged.")
 			dest := cfg.Http.Destinations
 
 			for i := 0; i < len(dest); i++ {
