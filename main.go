@@ -74,7 +74,17 @@ func ByteCountDecimal(b int64) string {
 //go:embed views/*
 var viewsfs embed.FS
 
+var last_reached time.Time
+
+type ReachResult struct {
+	Destination string
+	Reached     bool
+}
+
+var reach_results []ReachResult
+
 func main() {
+	last_reached = time.Unix(0, 0)
 	// Parse config.toml
 	cfg, err := Unmarshal()
 
@@ -123,33 +133,31 @@ func main() {
 	})
 
 	app.Get("/reach", func(c *fiber.Ctx) error {
-		type Result struct {
-			Destination string
-			Reached     bool
-		}
+		if time.Now().Sub(last_reached) > 5*time.Minute {
+			fmt.Println("Pinged.")
+			dest := cfg.Http.Destinations
 
-		dest := cfg.Http.Destinations
-		results := []Result{}
+			for i := 0; i < len(dest); i++ {
+				is200 := false
+				resp, err := http.Get(dest[i])
 
-		for i := 0; i < len(dest); i++ {
-			is200 := false
-			resp, err := http.Get(dest[i])
-
-			if err == nil {
-				if resp.StatusCode == 200 {
-					is200 = true
+				if err == nil {
+					if resp.StatusCode == 200 {
+						is200 = true
+					}
 				}
+
+				result := ReachResult{
+					Destination: dest[i],
+					Reached:     is200,
+				}
+
+				reach_results = append(reach_results, result)
+				last_reached = time.Now()
 			}
 
-			result := Result{
-				Destination: dest[i],
-				Reached:     is200,
-			}
-
-			results = append(results, result)
 		}
-
-		u, err := json.Marshal(results)
+		u, err := json.Marshal(reach_results)
 		if err != nil {
 			panic(err)
 		}
