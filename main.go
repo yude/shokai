@@ -106,7 +106,7 @@ func main() {
 			"domain":          cfg.General.Domain,
 			"loadavg":         fmt.Sprintf("%.2f, %.2f, %.2f", loadavg.One, loadavg.Five, loadavg.Fifteen),
 			"uptime":          uptime.Format(),
-			"free_ram":        ByteCountDecimal(int64(mem.Free)),
+			"free_ram":        ByteCountDecimal(int64(mem.ActualFree)),
 			"client_source":   ip_version,
 		})
 	})
