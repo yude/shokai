@@ -16,6 +16,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
 	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/load"
 	"github.com/shirou/gopsutil/v3/mem"
 )
@@ -125,6 +126,9 @@ func main() {
 
 		l, _ := load.Avg()
 
+		bt, _ := host.BootTime()
+		btFromUnix := time.Unix(int64(bt), 0)
+
 		client_ip := c.IP()
 		headers := c.GetReqHeaders()
 		forwarded, ok := headers["X-Forwarded-For"]
@@ -143,6 +147,7 @@ func main() {
 		return c.Render("views/index", fiber.Map{
 			"cpu":           cpus[0].ModelName,
 			"platform":      runtime.GOOS,
+			"boot_time":     btFromUnix,
 			"arch":          runtime.GOARCH,
 			"location":      cfg.General.Location,
 			"hostname":      strings.Replace(hostname, "s-", "", -1),

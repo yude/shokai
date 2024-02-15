@@ -8,6 +8,15 @@
     <meta property="og:title" content="{{.hostname}}">
     <meta property="og:description" content="Landing page of {{.hostname}}.">
     <title>{{.hostname}}</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        code {
+            font-size: 120%;
+        }
+    </style>
 </head>
 
 <body>
@@ -16,6 +25,7 @@
         <span style="display: block; font-size: 2em">{{.hostname}}</span>
         <span>This server is running at {{.location}}.</span>
     </div>
+    <hr />
     <div style="margin-bottom: 5px">
         <span style="display: block; font-size: 1.3em">About this server</span>
         <ul>
@@ -24,6 +34,7 @@
         </ul>
         <span style="display: block; font-size: 1.3em">Operating status</span>
         <ul>
+            <li>Up since {{.boot_time}}</li>
             <li>Load average: {{.loadavg}}</li>
             <li>RAM: {{.ram_used}}% used</li>
         </ul>
@@ -35,8 +46,8 @@
     <div style="margin-bottom: 5px">
         <span style="display: block; font-size: 1.3em">About you</span>
         <ul>
-            <li>Source: {{.client_ip}}:{{.client_port}} ({{.client_source}})</li>
-            <li>Host: {{.client_host}}</li>
+            <li>Source: <code>{{.client_ip}}:{{.client_port}}</code> ({{.client_source}})</li>
+            <li>Host: <code>{{.client_host}}</code></li>
         </ul>
     </div>
     <small>
