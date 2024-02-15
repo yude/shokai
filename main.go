@@ -138,7 +138,7 @@ func main() {
 
 		remote_addr, err := net.LookupAddr(client_ip)
 		if err != nil {
-			remote_addr[0] = "N/A"
+			remote_addr = append(remote_addr, "N/A")
 		}
 		if len(remote_addr) == 0 {
 			remote_addr = append(remote_addr, "N/A")
