@@ -136,6 +136,9 @@ func main() {
 		if err != nil {
 			remote_addr[0] = "N/A"
 		}
+		if len(remote_addr) == 0 {
+			remote_addr[0] = "N/A"
+		}
 
 		return c.Render("views/index", fiber.Map{
 			"cpu":           cpus[0].ModelName,
