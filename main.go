@@ -141,7 +141,7 @@ func main() {
 			remote_addr[0] = "N/A"
 		}
 		if len(remote_addr) == 0 {
-			remote_addr[0] = "N/A"
+			remote_addr = append(remote_addr, "N/A")
 		}
 
 		return c.Render("views/index", fiber.Map{
