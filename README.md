@@ -1,11 +1,11 @@
 # shokai
-A landing page for Linux servers
+
+Landing page for our servers
 
 ## Setup
 * Docker Compose
     * `docker-compose.yaml`
     ```yaml
-    version: '3.9'
     services:
     app:
         container_name: shokai
@@ -14,21 +14,14 @@ A landing page for Linux servers
         - type: bind
             source: ./config.toml
             target: /app/config.toml
+        - type: bind
+            source: /etc/hostname
+            target: /etc/host_hostname
+            read_only: true
         restart: always
     ```
     * `config.toml`
-        * Change the values as you like.
-    ```toml
-    [general]
-        location_id = "KIX"
-        location_pretty = "Osaka, Japan"
-        domain = "kix.example.com"
-
-    [http]
-        destinations = [
-            "https://www.google.co.jp"
-        ]
-    ```
+        * Please refer to `config.sample.toml` for format.
 
 ## License
 MIT

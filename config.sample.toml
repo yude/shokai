@@ -1,7 +1,5 @@
 [general]
-    location_id = "KIX"
-    location_pretty = "Osaka, Japan"
-    domain = "kix.example.com"
+    location = "Osaka, Japan"
 
 [http]
     destinations = [

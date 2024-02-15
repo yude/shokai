@@ -4,24 +4,25 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
+	"os"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
-	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/load"
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
 type (
 	GeneralSection struct {
-		LocationId     string `toml:"location_id"`
-		LocationPretty string `toml:"location_pretty"`
-		Domain         string `toml:"domain"`
+		Location string `toml:"location"`
 	}
 	HttpSection struct {
 		Destinations []string `toml:"destinations"`
@@ -33,7 +34,7 @@ type (
 )
 
 func Unmarshal() (Root, error) {
-	content, err := ioutil.ReadFile("./config.toml")
+	content, err := os.ReadFile("./config.toml")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,9 +86,22 @@ var reach_results []ReachResult
 
 func main() {
 	last_reached = time.Unix(0, 0)
+
+	hostname := ""
+	if Exists("/etc/host_hostname") {
+		bytes, err := os.ReadFile("/etc/host_hostname")
+		if err != nil {
+			return
+		}
+		hostname = string(bytes)
+	} else {
+		hostname, _ = os.Hostname()
+	}
+
+	cpus, err := cpu.Info()
+
 	// Parse config.toml
 	cfg, err := Unmarshal()
-
 	if err != nil {
 		panic(err)
 	}
@@ -101,17 +115,6 @@ func main() {
 		// Retrieve server information
 		/// General informations
 		v_mem, _ := mem.VirtualMemory()
-		l, _ := load.Avg()
-		h, _ := host.BootTime()
-		btFromUnix := time.Unix(int64(h), 0)
-		/// Machine temperature
-		t, _ := host.SensorsTemperatures()
-		var temperature string
-		if len(t) > 0 {
-			temperature = fmt.Sprintf("%.2f ℃", t[0].Temperature)
-		} else {
-			temperature = "Not available."
-		}
 
 		var ip_version string
 		if isIpv6(c.IP()) {
@@ -120,15 +123,32 @@ func main() {
 			ip_version = "IPv4"
 		}
 
+		l, _ := load.Avg()
+
+		client_ip := c.IP()
+		headers := c.GetReqHeaders()
+		forwarded, ok := headers["X-Forwarded-For"]
+		if ok {
+			client_ip = forwarded
+		}
+
+		remote_addr, err := net.LookupAddr(client_ip)
+		if err != nil {
+			remote_addr[0] = "N/A"
+		}
+
 		return c.Render("views/index", fiber.Map{
-			"location_id":     cfg.General.LocationId,
-			"location_pretty": cfg.General.LocationPretty,
-			"domain":          cfg.General.Domain,
-			"loadavg":         fmt.Sprintf("%.2f, %.2f, %.2f", l.Load1, l.Load5, l.Load15),
-			"uptime":          btFromUnix,
-			"ram_used":        fmt.Sprintf("%.2f", v_mem.UsedPercent),
-			"client_source":   ip_version,
-			"temperature":     temperature,
+			"cpu":           cpus[0].ModelName,
+			"platform":      runtime.GOOS,
+			"arch":          runtime.GOARCH,
+			"location":      cfg.General.Location,
+			"hostname":      strings.Replace(hostname, "s-", "", -1),
+			"loadavg":       fmt.Sprintf("%.2f, %.2f, %.2f", l.Load1, l.Load5, l.Load15),
+			"ram_used":      fmt.Sprintf("%.2f", v_mem.UsedPercent),
+			"client_source": ip_version,
+			"client_ip":     client_ip,
+			"client_port":   c.Port(),
+			"client_host":   remote_addr[0],
 		})
 	})
 
@@ -166,4 +186,9 @@ func main() {
 	})
 
 	log.Fatal(app.Listen(":3000"))
+}
+
+func Exists(filename string) bool {
+	_, err := os.Stat(filename)
+	return err == nil
 }

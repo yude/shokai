@@ -2,22 +2,25 @@
 <html>
 
 <head>
-  <title>{{.location_id}}</title>
+  <title>{{.hostname}}</title>
 </head>
 
 <body>
     <main style="max-width: 30em; margin-left: auto; margin-right: auto">
     <div style="margin-bottom: 5px">
-        <span style="display: block; font-size: 2em">{{.domain}}</span>
-        <span>This server is running at {{.location_pretty}}.</span>
+        <span style="display: block; font-size: 2em">{{.hostname}}</span>
+        <span>This server is running at {{.location}}.</span>
     </div>
     <div style="margin-bottom: 5px">
-        <span style="display: block; font-size: 1.3em">Server status</span>
+        <span style="display: block; font-size: 1.3em">About this server</span>
+        <ul>
+            <li>Platform: {{.platform}} ({{.arch}})</li>
+            <li>CPU: {{.cpu}}</li>
+        </ul>
+        <span style="display: block; font-size: 1.3em">Operating status</span>
         <ul>
             <li>Load average: {{.loadavg}}</li>
-            <li>Up since {{.uptime}}</li>
-            <li>{{.ram_used}}% of RAM used</li>
-            <li>Temperature: {{.temperature}}</li>
+            <li>RAM: {{.ram_used}}% used</li>
         </ul>
         <span style="display: block; font-size: 1.3em">Reachability from here</span>
         <ul id="reach">
@@ -25,11 +28,15 @@
         </ul>
     </div>
     <div style="margin-bottom: 5px">
-        <span style="display: block; font-size: 1.3em">Your information</span>
+        <span style="display: block; font-size: 1.3em">About you</span>
         <ul>
-            <li>You are connecting to us via {{.client_source}}.</li>
+            <li>Source: {{.client_ip}}:{{.client_port}} ({{.client_source}})</li>
+            <li>Host: {{.client_host}}</li>
         </ul>
     </div>
+    <small>
+        Data displayed on this page may contain personal information. Please be careful when sharing its content.
+    </small>
 </main>
 
 <script async>
