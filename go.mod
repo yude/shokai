@@ -2,8 +2,6 @@ module github.com/yude/shokai
 
 go 1.21
 
-toolchain go1.21.6
-
 require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/gofiber/fiber/v2 v2.44.0
