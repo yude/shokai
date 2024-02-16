@@ -21,4 +21,5 @@
 go.work
 
 shokai
+!rc.d/shokai
 config.toml

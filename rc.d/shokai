@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. /etc/rc.subr
+
+name=shokai
+rcvar=shokai_enable
+
+command="/home/yude/shokai/rc.d/shokai"
+load_rc_config $name
+run_rc_command "$1"
