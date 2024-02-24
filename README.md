@@ -1,8 +1,9 @@
 # shokai
 
-Landing page for our servers
+Landing page for our servers. Supports Linux and FreeBSD.
 
 ## Setup
+
 * Docker Compose
     * `docker-compose.yaml`
     ```yaml
