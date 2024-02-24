@@ -24,6 +24,7 @@ import (
 type (
 	GeneralSection struct {
 		Location string `toml:"location"`
+		Connection string `toml:"connection"`
 	}
 	HttpSection struct {
 		Destinations []string `toml:"destinations"`
@@ -145,8 +146,9 @@ func main() {
 		}
 
 		return c.Render("views/index", fiber.Map{
-			"cpu":           cpus[0].ModelName,
 			"platform":      runtime.GOOS,
+			"connection":	 cfg.General.Connection,
+			"cpu":           cpus[0].ModelName,
 			"boot_time":     btFromUnix,
 			"arch":          runtime.GOARCH,
 			"location":      cfg.General.Location,
