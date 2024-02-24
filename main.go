@@ -51,10 +51,10 @@ func Unmarshal() (Root, error) {
 
 func isIpv6(ip string) bool {
 	for i := 0; i < len(ip); i++ {
-		if ip[i] == "." {
+		if ip[i] == '.' {
 			return false
 		}
-		if ip[i] == ":" {
+		if ip[i] == ':' {
 			return true
 		}
 	}
