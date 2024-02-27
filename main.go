@@ -23,7 +23,7 @@ import (
 
 type (
 	GeneralSection struct {
-		Location string `toml:"location"`
+		Location   string `toml:"location"`
 		Connection string `toml:"connection"`
 	}
 	HttpSection struct {
@@ -50,15 +50,7 @@ func Unmarshal() (Root, error) {
 }
 
 func isIpv6(ip string) bool {
-	for i := 0; i < len(ip); i++ {
-		if ip[i] == '.' {
-			return false
-		}
-		if ip[i] == ':' {
-			return true
-		}
-	}
-	return false
+	return strings.Count(ip, ":") >= 2
 }
 
 func ByteCountDecimal(b int64) string {
@@ -147,7 +139,7 @@ func main() {
 
 		return c.Render("views/index", fiber.Map{
 			"platform":      runtime.GOOS,
-			"connection":	 cfg.General.Connection,
+			"connection":    cfg.General.Connection,
 			"cpu":           cpus[0].ModelName,
 			"boot_time":     btFromUnix,
 			"arch":          runtime.GOARCH,
