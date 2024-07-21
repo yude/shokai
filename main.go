@@ -110,13 +110,6 @@ func main() {
 		/// General informations
 		v_mem, _ := mem.VirtualMemory()
 
-		var ip_version string
-		if isIpv6(c.IP()) {
-			ip_version = "IPv6"
-		} else {
-			ip_version = "IPv4"
-		}
-
 		l, _ := load.Avg()
 
 		bt, _ := host.BootTime()
@@ -137,7 +130,13 @@ func main() {
 			remote_addr = append(remote_addr, "N/A")
 		}
 
-		return c.Render("views/index", fiber.Map{
+		index_path := "views/index"
+		if Exists("index.html") {
+			index_path = "index"
+			viewsfs.ReadFile("index.html")
+		}
+
+		return c.Render(index_path, fiber.Map{
 			"platform":      runtime.GOOS,
 			"connection":    cfg.General.Connection,
 			"cpu":           cpus[0].ModelName,
@@ -147,7 +146,6 @@ func main() {
 			"hostname":      strings.Replace(hostname, "s-", "", -1),
 			"loadavg":       fmt.Sprintf("%.2f, %.2f, %.2f", l.Load1, l.Load5, l.Load15),
 			"ram_used":      fmt.Sprintf("%.2f", v_mem.UsedPercent),
-			"client_source": ip_version,
 			"client_ip":     client_ip,
 			"client_port":   c.Port(),
 			"client_host":   remote_addr[0],
@@ -164,7 +162,7 @@ func main() {
 				resp, err := http.Get(dest[i])
 
 				if err == nil {
-					if resp.StatusCode == 200 {
+					if resp.StatusCode <= 400 {
 						is200 = true
 					}
 				}
