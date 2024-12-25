@@ -97,7 +97,7 @@ func main() {
 	// Parse config.toml
 	cfg, err := Unmarshal()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	engine := html.NewFileSystem(http.FS(viewsfs), ".html")
@@ -119,7 +119,7 @@ func main() {
 		headers := c.GetReqHeaders()
 		forwarded, ok := headers["X-Forwarded-For"]
 		if ok {
-			client_ip = forwarded
+			client_ip = strings.Join(forwarded, "")
 		}
 
 		remote_addr, err := net.LookupAddr(client_ip)
@@ -131,24 +131,20 @@ func main() {
 		}
 
 		index_path := "views/index"
-		if Exists("index.html") {
-			index_path = "index"
-			viewsfs.ReadFile("index.html")
-		}
 
 		return c.Render(index_path, fiber.Map{
-			"platform":      runtime.GOOS,
-			"connection":    cfg.General.Connection,
-			"cpu":           cpus[0].ModelName,
-			"boot_time":     btFromUnix,
-			"arch":          runtime.GOARCH,
-			"location":      cfg.General.Location,
-			"hostname":      strings.Replace(hostname, "s-", "", -1),
-			"loadavg":       fmt.Sprintf("%.2f, %.2f, %.2f", l.Load1, l.Load5, l.Load15),
-			"ram_used":      fmt.Sprintf("%.2f", v_mem.UsedPercent),
-			"client_ip":     client_ip,
-			"client_port":   c.Port(),
-			"client_host":   remote_addr[0],
+			"platform":    runtime.GOOS,
+			"connection":  cfg.General.Connection,
+			"cpu":         cpus[0].ModelName,
+			"boot_time":   btFromUnix,
+			"arch":        runtime.GOARCH,
+			"location":    cfg.General.Location,
+			"hostname":    strings.Replace(hostname, "s-", "", -1),
+			"loadavg":     fmt.Sprintf("%.2f, %.2f, %.2f", l.Load1, l.Load5, l.Load15),
+			"ram_used":    fmt.Sprintf("%.2f", v_mem.UsedPercent),
+			"client_ip":   client_ip,
+			"client_port": c.Port(),
+			"client_host": remote_addr[0],
 		})
 	})
 
