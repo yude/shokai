@@ -1,4 +1,4 @@
-FROM golang:alpine3.17 AS builder
+FROM golang:1.25.1-trixie AS builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ RUN go mod download
 COPY ./ ./
 RUN go build -o shokai
 
-FROM golang:alpine3.17 AS runner
+FROM golang:1.25.1-trixie AS runner
 
 WORKDIR /app
 
